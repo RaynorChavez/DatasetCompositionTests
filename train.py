@@ -1,0 +1,46 @@
+import pytorch_lightning as pl
+
+import torch.utils.data.dataloader as DataLoader
+
+from pl_bolts.models.self_supervised import SimCLR
+from pl_bolts.datamodules import ImagenetDataModule
+
+from pl_bolts.models.self_supervised.simclr \
+    import SimCLRTrainDataTransform
+from pl_bolts.models.self_supervised.simclr \
+    import SimCLREvalDataTransform
+
+
+# Pytorch and Torchvision Imports
+import torch
+import torch.nn as nn
+import torchvision
+from torch.optim import Adam
+import torch.nn as nn
+import torch.utils.data as data
+import torchvision.datasets as dsets
+import torchvision.transforms as transforms
+import torchvision.utils as vutils
+
+#data
+data_dir = './data/'
+datamodule = ImagenetDataModule(data_dir, image_size=224)
+print(datamodule)
+
+#transform
+#datamodule.train_transform = SimCLRTrainDataTransform()
+#datamodule.val_transforms = SimCLREvalDataTransform()
+
+#model
+BATCH_SIZE = 20
+model = SimCLR( gpus=-1, batch_size=BATCH_SIZE, dataset=data_dir, num_samples=6000)
+
+dataset = dsets.ImageFolder(
+    root=data_dir,
+    transform=SimCLRTrainDataTransform(input_height=512)
+)
+dataloader = data.DataLoader(dataset, batch_size=64, shuffle=True)
+
+#train
+trainer = pl.Trainer()
+trainer.fit(model, dataloader)
