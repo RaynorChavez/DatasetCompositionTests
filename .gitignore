@@ -1,3 +1,5 @@
 data/
 frl_apartment_0/
 simclr/
+.ipynb_checkpoints/
+saved_models/
