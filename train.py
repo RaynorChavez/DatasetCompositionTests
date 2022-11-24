@@ -50,5 +50,5 @@ print("Device: {}".format(device))
 print("Epochs: {}".format(epochs))
 
 model = SimCLR(2, 5, 5, dataset, max_epochs=epochs)
-trainer = pl.Trainer(accelerator="gpu", max_epochs=epochs)
+trainer = pl.Trainer(accelerator="gpu", max_epochs=epochs, default_root_dir="/trained_models/")
 trainer.fit(model, train_dataloaders=dataloader)
