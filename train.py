@@ -22,25 +22,33 @@ import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 import torchvision.utils as vutils
 
-#data
+
+if torch.cuda.is_available():
+    device = torch.device("cuda:0")
+    # Use deterministic cudnn algorithms
+    torch.backends.cudnn.deterministic = True
+    epochs = 10
+else:
+    device = torch.device("cpu")
+    epochs = 5
+
 data_dir = './data/'
-datamodule = ImagenetDataModule(data_dir, image_size=224)
-print(datamodule)
 
-#transform
-#datamodule.train_transform = SimCLRTrainDataTransform()
-#datamodule.val_transforms = SimCLREvalDataTransform()
-
-#model
-BATCH_SIZE = 20
-model = SimCLR( gpus=-1, batch_size=BATCH_SIZE, dataset=data_dir, num_samples=6000)
+BATCH_SIZE=2
 
 dataset = dsets.ImageFolder(
     root=data_dir,
     transform=SimCLRTrainDataTransform(input_height=512)
 )
-dataloader = data.DataLoader(dataset, batch_size=64, shuffle=True)
+dataloader = data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=8)
 
-#train
-trainer = pl.Trainer()
-trainer.fit(model, dataloader)
+
+model = SimCLR( gpus=-1, batch_size=BATCH_SIZE, dataset=data_dir, num_samples=100, max_epochs=epochs)
+
+
+print("Device: {}".format(device))
+print("Epochs: {}".format(epochs))
+
+model = SimCLR(2, 5, 5, dataset, max_epochs=epochs)
+trainer = pl.Trainer(accelerator="gpu", max_epochs=epochs)
+trainer.fit(model, train_dataloaders=dataloader)
