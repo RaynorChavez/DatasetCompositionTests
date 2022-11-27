@@ -4,3 +4,6 @@ simclr/
 .ipynb_checkpoints/
 saved_models/
 trained_models/
+rundata/
+faile_evaluators/
+
